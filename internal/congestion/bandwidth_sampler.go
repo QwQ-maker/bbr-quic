@@ -1,6 +1,7 @@
 package congestion
 
 import (
+	"fmt"
 	"math"
 	"time"
 
@@ -202,6 +203,7 @@ func (s *BandwidthSampler) OnPacketSent(sentTime time.Time, lastSentPacket proto
 	}
 
 	s.totalBytesSent += sentBytes
+	fmt.Println(s.totalBytesSent)
 
 	// If there are no packets in flight, the time at which the new transmission
 	// opens can be treated as the A_0 point for the purpose of bandwidth

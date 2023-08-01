@@ -2,6 +2,7 @@ package congestion
 
 import (
 	"fmt"
+	"log"
 	"math"
 	"math/rand"
 	"os"
@@ -261,6 +262,7 @@ func log1() {
 
 // NewCubicSender makes a new cubic sender
 func NewBBRSender(clock Clock, rttStats *utils.RTTStats, initialCongestionWindow, maxCongestionWindow protocol.ByteCount, getBytesInFlight func() protocol.ByteCount) *bbrSender {
+	fmt.Println("####################################Loding bbr##########################################################")
 	log1()
 	return &bbrSender{
 		rttStats:                  rttStats,
@@ -318,6 +320,7 @@ func (b *bbrSender) HasPacingBudget(time.Time) bool { return false }
 
 // 彻底重写
 func (b *bbrSender) OnPacketSent(sentTime time.Time, bytesInFlight protocol.ByteCount, packetNumber protocol.PacketNumber, bytes protocol.ByteCount, isRetransmittable bool) {
+	fmt.Println("##########################PacketSent######################################")
 	b.lastSendPacket = packetNumber
 
 	if bytesInFlight == 0 && b.sampler.isAppLimited {
@@ -327,8 +330,8 @@ func (b *bbrSender) OnPacketSent(sentTime time.Time, bytesInFlight protocol.Byte
 	if b.aggregationEpochStartTime.IsZero() {
 		b.aggregationEpochStartTime = sentTime
 	}
-
 	b.sampler.OnPacketSent(sentTime, packetNumber, bytes, bytesInFlight, isRetransmittable)
+	log.Println(b.GetCongestionWindow())
 }
 
 //func (c *cubicSender) OnPacketSent(
