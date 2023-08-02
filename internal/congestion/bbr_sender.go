@@ -12,6 +12,8 @@ import (
 	"github.com/quic-go/quic-go/internal/utils"
 )
 
+var count = 0
+
 // 数据定义
 type bbrMode int
 type bbrRecoveryState int
@@ -263,7 +265,6 @@ func log1() {
 // NewCubicSender makes a new cubic sender
 func NewBBRSender(clock Clock, rttStats *utils.RTTStats, initialCongestionWindow, maxCongestionWindow protocol.ByteCount, getBytesInFlight func() protocol.ByteCount) *bbrSender {
 	fmt.Println("####################################Loding bbr##########################################################")
-	log1()
 	return &bbrSender{
 		rttStats:                  rttStats,
 		GetBytesInFlight:          getBytesInFlight,
@@ -321,6 +322,7 @@ func (b *bbrSender) HasPacingBudget(time.Time) bool { return false }
 // 彻底重写
 func (b *bbrSender) OnPacketSent(sentTime time.Time, bytesInFlight protocol.ByteCount, packetNumber protocol.PacketNumber, bytes protocol.ByteCount, isRetransmittable bool) {
 	fmt.Println("##########################PacketSent######################################")
+	fmt.Println(b.GetCongestionWindow())
 	b.lastSendPacket = packetNumber
 
 	if bytesInFlight == 0 && b.sampler.isAppLimited {
@@ -331,7 +333,6 @@ func (b *bbrSender) OnPacketSent(sentTime time.Time, bytesInFlight protocol.Byte
 		b.aggregationEpochStartTime = sentTime
 	}
 	b.sampler.OnPacketSent(sentTime, packetNumber, bytes, bytesInFlight, isRetransmittable)
-	log.Println(b.GetCongestionWindow())
 }
 
 //func (c *cubicSender) OnPacketSent(
@@ -378,6 +379,7 @@ func (b *bbrSender) InSlowStart() bool {
 
 // 彻底重写
 func (b *bbrSender) GetCongestionWindow() protocol.ByteCount {
+	//log.Println("GetCongestionWindow", b.congestionWindow)
 	if b.mode == PROBE_RTT {
 		return b.ProbeRttCongestionWindow()
 	}
@@ -594,6 +596,7 @@ func (b *bbrSender) ProbeRttCongestionWindow() protocol.ByteCount {
 }
 
 func (b *bbrSender) GetTargetCongestionWindow(gain float64) protocol.ByteCount {
+	log.Println("targetCW")
 	bdp := protocol.ByteCount(b.GetMinRtt()) * protocol.ByteCount(b.BandwidthEstimate())
 	congestionWindow := protocol.ByteCount(gain * float64(bdp))
 

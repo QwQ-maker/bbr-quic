@@ -3,6 +3,7 @@ package ackhandler
 import (
 	"errors"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/quic-go/quic-go/internal/congestion"
@@ -12,6 +13,8 @@ import (
 	"github.com/quic-go/quic-go/internal/wire"
 	"github.com/quic-go/quic-go/logging"
 )
+
+var count = 0
 
 const (
 	// Maximum reordering in time space before time based loss detection considers a packet lost.
@@ -737,6 +740,10 @@ func (h *sentPacketHandler) PopPacketNumber(encLevel protocol.EncryptionLevel) p
 }
 
 func (h *sentPacketHandler) SendMode(now time.Time) SendMode {
+	count++
+	if count%100000 == 0 {
+		log.Println("sendMode")
+	}
 	numTrackedPackets := h.appDataPackets.history.Len()
 	if h.initialPackets != nil {
 		numTrackedPackets += h.initialPackets.history.Len()

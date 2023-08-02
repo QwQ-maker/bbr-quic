@@ -5,6 +5,7 @@
 package mocks
 
 import (
+	"log"
 	reflect "reflect"
 	time "time"
 
@@ -37,6 +38,7 @@ func (m *MockSendAlgorithmWithDebugInfos) EXPECT() *MockSendAlgorithmWithDebugIn
 
 // CanSend mocks base method.
 func (m *MockSendAlgorithmWithDebugInfos) CanSend(arg0 protocol.ByteCount) bool {
+	log.Println("Mock send")
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CanSend", arg0)
 	ret0, _ := ret[0].(bool)
